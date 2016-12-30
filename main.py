@@ -1,96 +1,93 @@
 #!/usr/bin/python3
-
+import sys
 import re
-from math import sqrt
+import atexit
+from datetime import datetime
+from shapely.geometry import Point, Polygon
 
-# def get_data(file):
-#     with open(file, 'r') as fp:
-#         data = fp.read()
-#     return data
+log_file_name = 'results/log_file_' + str(datetime.now()).replace(" ", "_") + '.txt'
+log_file = open(log_file_name, 'w+')
 
-# def validate_data(data):
-#     valid_pattern = re.compile("^([0-9]+):([0-9]+)(,?)(\.)$")
+def validate_data(data):
+    line_pattern = re.compile('^(([0-9]+):([0-9]+)(,?))+.$')
+    for line in data:
+        if not re.match(line_pattern, line):
+            log('invalid file')
+            exit(1)
+    return
 
+def log(string):
+    log_file.write(string + '\n')
+    print(string, file=sys.stdout)
+    return
 
-line = "1:2,3:4,5:6." 
-line.strip('.')
-line_points_x = dict(('x' + v.strip(), x.strip()) for x,v in 
-              (item.split(':') for item in line.split(',')))
+def close_log(log_file):
+    log_file.close()
 
-def areCollinear(*args):
-    x = []
-    y = []
-    i = 0
-    points = args[0]
-    print(type(points), 'areCollinear')
-    print(points, 'areCollinear')
-    for i, point in enumerate(points):
-        print(point[0], point[1])
-        x.append(point[0])
-        y.append(point[1])
-        print(i)
-        if i==2:
-            break
+atexit.register(close_log, log_file)
 
-    slope1 = ((y[1] - y[0]) / (x[1] - x[0]))
-    slope2 = ((y[2] - y[1]) / (x[2] - x[1]))
-    if slope1==slope2:
-        return True
-    else:
-        return False
+def batch(iterable, count=1):
+    iterable_len = len(iterable)
+    for idx in range(0, iterable_len, count):
+        yield iterable[idx:min(idx+count, iterable_len)]
 
+def find_triangle(line):
+    for sh in batch(line, 3):
+        if len(sh)<3:
+            return
+        shape = Polygon(sh)
+        if shape.is_valid:
+            log(str(sh) + ' points form a triangle')
+        # else:
+        #     print('not triangle')
 
-class Point:
+def find_square(line):
+    for sh in batch(line, 4):
+        if len(sh)<4:
+            return
+        shape = Polygon(sh)
+        if (shape.is_valid
+            and (Point(sh[0]).distance(Point(sh[1]))) ==
+                (Point(sh[1]).distance(Point(sh[2])))):
+            log(str(sh) + ' points form a square')
+        # else:
+        #   print('not square')
 
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
+def find_parallelogram(line):
+    for sh in batch(line, 4):
+        if len(sh)<4:
+            return
+        shape = Polygon(sh)
+        if (shape.is_valid
+            and (Point(sh[0]).distance(Point(sh[1]))) ==
+                (Point(sh[2]).distance(Point(sh[3])))):
+            log(str(sh) + ' points form a parallelogram')
 
-    def get_args(self):
-        return (self.x, self.y,)
+if __name__ == '__main__':
+    with open(sys.argv[1], 'r') as fp:
+        data = fp.readlines()
+        line_count = len(data)
 
-class Shape:
+    validate_data(data)
 
-    def __init__(self, *args):
-        self.args = args
+    points_list = [[] for i in range(0, line_count)]
+    point_pattern = re.compile('([0-9]+):([0-9]+)')
 
-    def get_shape(self):
-        if self.is_triangle():
-            return 'triangle'
-        elif: self.is_square():
-            return 'square'
-        return None
+    for i, line in enumerate(data):
+        line_points = re.findall(point_pattern, line)
+        for point in line_points:
+            points_list[i].append([float(idx) for idx in point])
 
-    def is_triangle(self):
-        points = self.args
+    for line in range(0, line_count):
+        find_triangle(points_list[line])
+        find_square(points_list[line])
+        find_parallelogram(points_list[line])
 
-        if len(points)!=3 or len(set(points))!=len(points):
-            return False
-        elif areCollinear(points):
-            return False
-        else:
-            side1 = sqrt((points[0][0] - points[1][0])**2 \
-                       + (points[0][1] - points[1][1])**2)
-            side2 = sqrt((points[1][0] - points[2][0])**2 \
-                       + (points[1][1] - points[2][1])**2)
-            side3 = sqrt((points[2][0] - points[0][0])**2 \
-                       + (points[2][1] - points[0][1])**2)
-            triangle = [side1, side2, side3]
-            triangle.sort()
-            print(triangle)
-            if triangle[2] < triangle[0] + triangle[1]:
-                return True
-            else:
-                return False
+# for line in range(0, line_count):
+#   print(points_list[line][:3])
 
-    def get_args(self):
-        return self.args
+# shape = Polygon(points_list[0])
+# print(shape.is_valid)
 
-if __name__ == "__main__":
-    p1 = Point(0, 2)
-    p2 = Point(1, 3)
-    p3 = Point(3, 6)
-    p4 = Point(4, 6)
-    # print(areCollinear(p1.get_args(), p2.get_args(), p3.get_args(),))
-    sh = Shape(p1.get_args(), p2.get_args(), p3.get_args())
-    print(sh.get_shape())
+# triangle = Polygon([(1, 1), (2, 3), (3, 1)])
+

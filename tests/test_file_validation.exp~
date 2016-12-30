@@ -1,0 +1,9 @@
+#!/usr/bin/expect
+source common.tcl
+
+set testLine [createTestLine 0:0 0:1 1:1 1:0]
+createTestFile $testLine
+
+catch {exec python main.py test.file} output
+
+puts $output
