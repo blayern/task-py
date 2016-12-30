@@ -5,13 +5,13 @@ import atexit
 from datetime import datetime
 from shapely.geometry import Point, Polygon
 
-log_file_name = 'results/log_file_' + str(datetime.now()).replace(" ", "_") + '.txt'
+log_file_name = 'result_file.txt'
 log_file = open(log_file_name, 'w+')
 
 def validate_data(data):
     line_pattern = re.compile('^(([0-9]+):([0-9]+)(,?))+.$')
     for line in data:
-        if not re.match(line_pattern, line):
+        if not re.match(line_pattern, line) or re.match(re.compile('(.*),.$'), line):
             log('invalid file')
             exit(1)
     return

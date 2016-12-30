@@ -1,0 +1,5 @@
+[[0.0, 0.0], [0.0, 1.0], [1.0, 1.0]] points form a triangle
+[[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]] points form a square
+[[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0]] points form a parallelogram
+[[12.0, 0.0], [0.0, 61.0], [311.0, 121.0]] points form a triangle
+[[0.0, 320.0], [0.0, 781.0], [121.0, 4121.0]] points form a triangle
