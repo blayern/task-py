@@ -1,0 +1,173 @@
+#!/usr/bin/expect
+source tests/common.tcl
+
+set step -1
+set failed 0
+set testTitle "Check Shape Recongnition of square"
+
+proc testConfig {} {
+	set testLine [createTestLine 0:0 0:1 1:1 1:0]
+	createTestFile $testLine
+}
+
+proc testClearConfig {} {
+}
+
+proc test_stepByStep {} {
+	global failed step output exitCode
+	if {$failed} {
+		testClearConfig
+		exit
+	}
+
+	incr step
+	
+	switch $step {
+		0 {puts "Step $step: Prepare initial Config"
+			testConfig
+			test_stepByStep
+		}
+		1 {puts "Step $step: Run program with one shape on one line"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		2 {puts "Step $step: Check shape is reported"
+			if {![regexp "points form a square" $output]} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shape not reported"}
+			test_stepByStep
+		}
+		3 {puts "Step $step: Check result_file content"
+			set fp [open "./result_file.txt" r]
+			set data [read $fp]
+			close $fp
+			if {[string trim $output "\n"] != [string trim $data "\n"]} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
+			test_stepByStep
+		}
+		4 {puts "Step $step: Create Multiple line file with shape on second line"
+			set testLine1 [createTestLine 12:0 0:61]
+			set testLine2 [createTestLine 0:0 0:1 1:1 1:0]
+			set testLine3 [createTestLine 0:320 0:781]
+			createTestFile $testLine1 $testLine2 $testLine3
+			test_stepByStep
+		}
+		5 {puts "Step $step: Run program with one shape on second line"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		6 {puts "Step $step: Check shape is reported"
+			set count 0
+			foreach line [split $output "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=1} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shape not reported"}
+			test_stepByStep
+		}
+		7 {puts "Step $step: Check result_file content"
+			set fp [open "./result_file.txt" r]
+			set data [read $fp]
+			close $fp
+			foreach line [split $data "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=1} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
+			test_stepByStep
+		}
+		8 {puts "Step $step: Create Multiple line file with two shapes on second line"
+			set testLine1 [createTestLine 12:0 0:61]
+			set testLine2 [createTestLine 0:0 0:1 1:1 1:0 7:8 7:10 9:10 9:8]
+			set testLine3 [createTestLine 0:320 0:781]
+			createTestFile $testLine1 $testLine2 $testLine3
+			test_stepByStep
+		}
+		9 {puts "Step $step: Run program with two shapes on second line"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		10 {puts "Step $step: Check shapes are reported"
+			set count 0
+			foreach line [split $output "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=2} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shapes not reported"}
+			test_stepByStep
+		}
+		11 {puts "Step $step: Check result_file content"
+			set fp [open "./result_file.txt" r]
+			set data [read $fp]
+			close $fp
+			foreach line [split $data "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=2} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
+			test_stepByStep
+		}
+		12 {puts "Step $step: Create Multiple line file with two shapes on two lines"
+			set testLine1 [createTestLine 12:0 0:61]
+			set testLine2 [createTestLine 0:0 0:1 1:1 1:0 7:8 7:10 9:10 9:8]
+			set testLine3 [createTestLine 0:0 -10:0 -10:-10 0:-10 0:0 0:1 1:1 1:0]
+			createTestFile $testLine1 $testLine2 $testLine3
+			test_stepByStep
+		}
+		13 {puts "Step $step: Run program with two shapes on two lines"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		14 {puts "Step $step: Check shapes are reported"
+			set count 0
+			foreach line [split $output "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=4} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shapes not reported"}
+			test_stepByStep
+		}
+		15 {puts "Step $step: Check result_file content"
+			set fp [open "./result_file.txt" r]
+			set data [read $fp]
+			close $fp
+			set count 0
+			foreach line [split $data "\r\n"] {
+				if {[regexp "points form a square" $line]} {incr count}
+			}
+			if {$count!=4} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
+			test_stepByStep
+		}
+		16 {puts "Step $step: Create Multiple line file with invalid shape"
+			set testLine [createTestLine 0:0 0:0 0:0 0:0]
+			createTestFile $testLine
+			test_stepByStep
+		}
+		17 {puts "Step $step: Run program with invalid shape on one lines"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		18 {puts "Step $step: Check shapes are reported"
+			set count 0
+			if {[regexp "points form a square" $output]} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "invalid shape reported"}
+			test_stepByStep
+		}
+		19 {puts "Step $step: Check result_file content"
+			set fp [open "./result_file.txt" r]
+			set data [read $fp]
+			close $fp
+			if {[regexp "points form a square" $data]} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
+			test_stepByStep
+		}
+		default {logResult "" "PASSED"; testClearConfig; exit}
+	}
+}
+
+proc test {} {
+	global testTitle
+	puts $testTitle
+	test_stepByStep
+}
+test

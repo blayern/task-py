@@ -61,7 +61,6 @@ proc test_stepByStep {} {
 		}
 		7 {puts "Step $step: Run program with Invalid test file"
 			set exitCode [catch {exec python main.py test.file} output]
-			puts $output
 			test_stepByStep
 		}
 		8 {puts "Step $step: Check file is reported invalid"
@@ -78,7 +77,6 @@ proc test_stepByStep {} {
 		}
 		10 {puts "Step $step: Run program with Invalid test file"
 			set exitCode [catch {exec python main.py test.file} output]
-			puts $output
 			test_stepByStep
 		}
 		11 {puts "Step $step: Check file is reported invalid"
