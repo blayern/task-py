@@ -1,14 +1,10 @@
 #!/usr/bin/expect
 
-set timeNow [clock seconds]
-set logFile [open "./results/logfile-[clock format $timeNow -format %Y-%M-%d-%H-%M-%S].txt" w+]
-
 proc logResult {step result {msg {}}} {
 	global logFile
 	if {$step==""} {set str ""
 	} else {set str "Step "}
-	puts "$str$step: $result $msg"
-	puts $logFile "$str$step: $result $msg"
+	puts "$step: $result $msg"
 }
 
 proc createTestLine {args} {
