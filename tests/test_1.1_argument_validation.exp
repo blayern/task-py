@@ -1,0 +1,55 @@
+#!/usr/bin/expect
+source tests/common.tcl
+
+set step -1
+set failed 0
+set testTitle "1.1 Check Argument Validation"
+
+proc testConfig {} {
+}
+
+proc testClearConfig {} {
+}
+
+proc test_stepByStep {} {
+	global failed step output exitCode
+	if {$failed} {
+		testClearConfig
+		exit
+	}
+
+	incr step
+	
+	switch $step {
+		0 {puts "Step $step: Prepare initial Config"
+			testConfig
+			test_stepByStep
+		}
+		1 {puts "Step $step: Run program without arguments"
+			set exitCode [catch {exec python main.py} output]
+            test_stepByStep
+		}
+		2 {puts "Step $step: Check argument exception is raised"
+			if {![regexp "invalid number of arguments" $output] || $exitCode!=1} {set failed 1}
+            if {$failed} {logResult $step "FAIL" "Argument exception not raised"}
+            test_stepByStep
+		}
+		3 {puts "Step $step: Run program with Invalid test file name"
+			set exitCode [catch {exec python main.py does_not_exists.file} output]
+            test_stepByStep
+		}
+		4 {puts "Step $step: Check file exception is raised"
+			if {![regexp "could not open file" $output] || $exitCode!=1} {set failed 1}
+            if {$failed} {logResult $step "FAIL" "File exception not raised"}
+            test_stepByStep
+		}
+		default {logResult "" "PASSED"; testClearConfig; exit}
+	}
+}
+
+proc test {} {
+	global testTitle
+	puts $testTitle
+	test_stepByStep
+}
+test
