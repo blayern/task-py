@@ -3,7 +3,7 @@ source tests/common.tcl
 
 set step -1
 set failed 0
-set testTitle "1.7 Check Shape Recongnition with unsorted points"
+set testTitle "1.8 Check Shape Recongnition with unsorted points"
 
 proc testConfig {} {
 	set testLineTriangle [createTestLine 0:0 1:1 1:0]
@@ -30,11 +30,35 @@ proc test_stepByStep {} {
 			testConfig
 			test_stepByStep
 		}
-		1 {puts "Step $step: Run program with one shape on multiple lines"
+		1 {puts "Step $step: Run program with shapes on multiple lines"
 			set exitCode [catch {exec python main.py test.file} output]
 			test_stepByStep
 		}
 		2 {puts "Step $step: Check shape is reported"
+			set count 0
+			foreach line [split $output "\r\n"] {
+				if {[regexp "points form a triangle" $line]} {incr count}
+				if {[regexp "points form a square" $line]} {incr count}
+				if {[regexp "points form a parallelogram" $line]} {incr count}
+				if {[regexp "points form a trapezoid" $line]} {incr count}
+			}
+			if {$count!=7} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shapes not reported"}
+			test_stepByStep
+		}
+		3 {puts "Step $step: Create File with changed poins' positions"
+			set testLineTriangle [createTestLine 0:0 1:0 1:1]
+			set testLineSquare [createTestLine 1:1 0:0 0:1 1:0]
+			set testLineParallelogram [createTestLine 2:1 0:0 1:1 1:0]
+			set testLineTrapezoid [createTestLine 1:2 0:0 1:1 0:3]
+			createTestFile $testLineTriangle $testLineSquare $testLineParallelogram $testLineTrapezoid
+			test_stepByStep
+		}
+		4 {puts "Step $step: Run program with shapes on multiple lines"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		5 {puts "Step $step: Check shape is reported"
 			set count 0
 			foreach line [split $output "\r\n"] {
 				if {[regexp "points form a triangle" $line]} {incr count}

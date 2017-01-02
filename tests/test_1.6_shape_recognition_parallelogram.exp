@@ -40,7 +40,10 @@ proc test_stepByStep {} {
 			set fp [open "./result_file.txt" r]
 			set data [read $fp]
 			close $fp
-			if {[string trim $output "\n"] != [string trim $data "\n"]} {set failed 1}
+			foreach line [split $data "\r\n"] {
+				if {[regexp "points form a parallelogram" $line]} {incr count}
+			}
+			if {$count!=1} {set failed 1}
 			if {$failed} {logResult $step "FAIL" "result_file content not valid"}
 			test_stepByStep
 		}
