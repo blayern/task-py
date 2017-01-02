@@ -52,6 +52,7 @@ def find_triangle(line):
     for sh in batch(line, 3):
         if len(sh)<3:
             return
+        # sh = sorted(sh, key=lambda sh: sh[1])
         shape = Polygon(sh)
         if shape.is_valid:
             log(str(sh) + ' points form a triangle')
@@ -60,6 +61,7 @@ def find_square(line):
     for sh in batch(line, 4):
         if len(sh)<4:
             return
+        sh = sorted(sh, key=lambda sh: sh[1])
         shape = Polygon(sh)
         if (shape.is_valid
             and abs(Point(sh[0]).distance(Point(sh[1]))) ==
@@ -70,6 +72,7 @@ def find_parallelogram(line):
     for sh in batch(line, 4):
         if len(sh)<4:
             return
+        sh = sorted(sh, key=lambda sh: sh[1])
         shape = Polygon(sh)
         if (shape.is_valid
             and abs(Point(sh[0]).distance(Point(sh[1]))) ==
@@ -84,20 +87,22 @@ def find_trapezoid(line):
     for sh in batch(line, 4):
         if len(sh)<4:
             return
+        sh = sorted(sh, key=lambda sh: sh[1])
         shape = Polygon(sh)
         if shape.is_valid:
-            first_angle_pair_sum = abs((azimuth(Point(sh[1]), Point(sh[0]))
-                                    - azimuth(Point(sh[3]), Point(sh[0])))
-                                    + (azimuth(Point(sh[2]), Point(sh[1]))
-                                    - azimuth(Point(sh[0]), Point(sh[1]))))
+            if (abs(Point(sh[0]).distance(Point(sh[1]))) != abs(Point(sh[2]).distance(Point(sh[3])))) or (abs(Point(sh[0]).distance(Point(sh[3]))) != abs(Point(sh[1]).distance(Point(sh[2])))):
+                first_angle_pair_sum = abs((azimuth(Point(sh[1]), Point(sh[0]))
+                                        - azimuth(Point(sh[3]), Point(sh[0])))
+                                        + (azimuth(Point(sh[2]), Point(sh[1]))
+                                        - azimuth(Point(sh[0]), Point(sh[1]))))
 
-            second_angle_pair_sum = abs((azimuth(Point(sh[1]), Point(sh[0]))
-                                    - azimuth(Point(sh[3]), Point(sh[0])))
-                                    + (azimuth(Point(sh[0]), Point(sh[3]))
-                                    - azimuth(Point(sh[2]), Point(sh[3]))))
+                second_angle_pair_sum = abs((azimuth(Point(sh[1]), Point(sh[0]))
+                                        - azimuth(Point(sh[3]), Point(sh[0])))
+                                        + (azimuth(Point(sh[0]), Point(sh[3]))
+                                        - azimuth(Point(sh[2]), Point(sh[3]))))
 
-            if first_angle_pair_sum == 180.0 or second_angle_pair_sum == 180.0:
-                log(str(sh) + ' points form a trapezoid')
+                if first_angle_pair_sum == 180.0 or second_angle_pair_sum == 180.0:
+                    log(str(sh) + ' points form a trapezoid')
 
 if __name__ == '__main__':
 
