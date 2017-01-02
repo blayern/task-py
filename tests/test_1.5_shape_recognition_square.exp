@@ -3,7 +3,7 @@ source tests/common.tcl
 
 set step -1
 set failed 0
-set testTitle "1.5 Check Shape Recongnition of square"
+set testTitle "1.5 Check Shape Recognition of square"
 
 proc testConfig {} {
 	set testLine [createTestLine 0:0 0:1 1:1 1:0]

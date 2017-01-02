@@ -3,7 +3,7 @@ source tests/common.tcl
 
 set step -1
 set failed 0
-set testTitle "1.8 Check Shape Recongnition with unsorted points"
+set testTitle "1.8 Check Shape Recognition with unsorted points"
 
 proc testConfig {} {
 	set testLineTriangle [createTestLine 0:0 1:1 1:0]

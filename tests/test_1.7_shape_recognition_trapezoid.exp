@@ -3,7 +3,7 @@ source tests/common.tcl
 
 set step -1
 set failed 0
-set testTitle "1.7 Check Shape Recongnition of trapezoid"
+set testTitle "1.7 Check Shape Recognition of trapezoid"
 
 proc testConfig {} {
 	set testLine [createTestLine 0:0 1:1 2:1 3:0]
