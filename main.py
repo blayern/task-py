@@ -72,18 +72,11 @@ def find_square(line):
     for sh in batch(line, 4):
         if len(sh)<4:
             return
-        # p = Point(sh[0])
-        # sh = sorted(sh, key=lambda sh: (p.y, p.x))
-        print(sh, 'square-un')
         mx = sum(x[0] for x in sh) / len(sh)
         my = sum(x[1] for x in sh) / len(sh)
         def algo(x):
             return (math.atan2(x[0] - mx, x[1] - my) + 2 * math.pi) % (2*math.pi)
         sh.sort(key=algo)
-        # sh = sorted(sh, key=lambda p: (p[1], p[0]), reverse=True)
-        print(sh, 'square')
-        # sh = sorted(sh, key=lambda p: p[0], reverse=False)
-        # sh = sorted(sh, key=lambda p: p[1], reverse=False)
         shape = Polygon(sh)
         if (shape.is_valid
             and abs(Point(sh[0]).distance(Point(sh[1]))) ==
@@ -101,8 +94,6 @@ def find_parallelogram(line):
         def algo(x):
             return (math.atan2(x[0] - mx, x[1] - my) + 2 * math.pi) % (2*math.pi)
         sh.sort(key=algo)
-        # sh = sorted(sh, key=lambda sh: (p.y, p.x))
-        # print(sh, 'para')
         shape = Polygon(sh)
         if (shape.is_valid
             and abs(Point(sh[0]).distance(Point(sh[1]))) ==
@@ -124,8 +115,6 @@ def find_trapezoid(line):
         def algo(x):
             return (math.atan2(x[0] - mx, x[1] - my) + 2 * math.pi) % (2*math.pi)
         sh.sort(key=algo)
-        # sh = sorted(sh, key=lambda sh: (p.y, p.x))
-        # print(sh, 'trap')
         shape = Polygon(sh)
         if shape.is_valid:
             if (abs(Point(sh[0]).distance(Point(sh[1]))) != abs(Point(sh[2]).distance(Point(sh[3])))) or (abs(Point(sh[0]).distance(Point(sh[3]))) != abs(Point(sh[1]).distance(Point(sh[2])))):
