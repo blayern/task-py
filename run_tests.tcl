@@ -15,8 +15,8 @@ foreach test [lsort -dictionary [glob -directory tests/ test_*.exp]] {
 	if {[string last "PASSED" $output]!=-1} {
 		puts "$testTitle - PASSED"
 	} elseif {[string first "FAIL" $output]!=-1} {
-		foreach line [split $output "\r\m"] {
-			if {[regexp "(\[0-9]+): FAIL (.*)" $line -> step msg]} {break}
+		foreach line [split $output "\r\n"] {
+			if {[regexp "FAIL at step (\[0-9]+) (.*)" $line -> step msg]} {break}
 		}
 		puts "$testTitle - FAIL at step $step - $msg"
 	} else {puts "$testTitle - BUG"}

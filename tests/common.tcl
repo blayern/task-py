@@ -3,8 +3,8 @@
 proc logResult {step result {msg {}}} {
 	global logFile
 	if {$step==""} {set str ""
-	} else {set str "Step "}
-	puts "$step: $result $msg"
+	} else {set str "at step "}
+	puts "$result $str$step $msg"
 }
 
 proc createTestLine {args} {
