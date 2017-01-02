@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 import sys
 import re
-import atexit, math
+import atexit
+import math
 import numpy as np
 from operator import itemgetter
 from datetime import datetime
