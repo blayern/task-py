@@ -1,0 +1,58 @@
+#!/usr/bin/expect
+source tests/common.tcl
+
+set step -1
+set failed 0
+set testTitle "1.7 Check Shape Recongnition with unsorted points"
+
+proc testConfig {} {
+	set testLineTriangle [createTestLine 0:0 1:1 1:0]
+	set testLineSquare [createTestLine 0:0 1:1 1:0 0:1]
+	set testLineParallelogram [createTestLine 0:0 2:1 1:0 1:1]
+	set testLineTrapezoid [createTestLine 0:0 1:2 0:3 1:1]
+	createTestFile $testLineTriangle $testLineSquare $testLineParallelogram $testLineTrapezoid
+}
+
+proc testClearConfig {} {
+}
+
+proc test_stepByStep {} {
+	global failed step output exitCode
+	if {$failed} {
+		testClearConfig
+		exit
+	}
+
+	incr step
+	
+	switch $step {
+		0 {puts "Step $step: Prepare initial Config"
+			testConfig
+			test_stepByStep
+		}
+		1 {puts "Step $step: Run program with one shape on multiple lines"
+			set exitCode [catch {exec python main.py test.file} output]
+			test_stepByStep
+		}
+		2 {puts "Step $step: Check shape is reported"
+			set count 0
+			foreach line [split $output "\r\n"] {
+				if {[regexp "points form a triangle" $line]} {incr count}
+				if {[regexp "points form a square" $line]} {incr count}
+				if {[regexp "points form a parallelogram" $line]} {incr count}
+				if {[regexp "points form a trapezoid" $line]} {incr count}
+			}
+			if {$count!=7} {set failed 1}
+			if {$failed} {logResult $step "FAIL" "shape not reported"}
+			test_stepByStep
+		}
+		default {logResult "" "PASSED"; testClearConfig; exit}
+	}
+}
+
+proc test {} {
+	global testTitle
+	puts $testTitle
+	test_stepByStep
+}
+test
